@@ -1,0 +1,22 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#include <zephyr/dt-bindings/pinctrl/esp-pinctrl-common.h>
+#include <dt-bindings/pinctrl/esp32s3-pinctrl.h>
+#include <zephyr/dt-bindings/pinctrl/esp32s3-gpio-sigmap.h>
+
+&pinctrl {
+	spim3_default: spim3_default {
+		group1 {
+			pinmux = <SPIM3_MISO_GPIO42>,
+					 <SPIM3_SCLK_GPIO41>,
+					 <SPIM3_CSEL_GPIO38>;
+		};
+		group2 {
+			pinmux = <SPIM2_MOSI_GPIO42>;
+			output-low;
+		};
+	};
+
+};

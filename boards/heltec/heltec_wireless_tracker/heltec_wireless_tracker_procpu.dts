@@ -1,0 +1,146 @@
+/*
+ * Copyright (c) 2023 Seeed Studio inc.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/dts-v1/;
+
+#include <espressif/esp32s3/esp32s3_fn8.dtsi>
+#include "heltec_wireless_tracker-pinctrl.dtsi"
+#include <zephyr/dt-bindings/mipi_dbi/mipi_dbi.h>
+
+/ {
+	model = "Heltec Wireless Tracker ESP32S3 PROCPU";
+	compatible = "espressif,esp32s3";
+
+	chosen {
+		zephyr,sram = &sram0;
+		zephyr,console = &usb_serial;
+		zephyr,shell-uart = &usb_serial;
+		zephyr,flash = &flash0;
+		zephyr,code-partition = &slot0_partition;
+		zephyr,display = &st7735r_160x80;
+	};
+
+	aliases {
+		i2c0 = &i2c0;
+		watchdog0 = &wdt0;
+		led0 = &led0;
+	};
+
+	leds {
+		compatible = "gpio-leds";
+		led0: led_0 {
+			gpios = <&gpio0 18 GPIO_ACTIVE_HIGH>;
+			label = "BUILTIN LED";
+		};
+	};
+
+
+	mipi_dbi_st7735r_160x80{
+		compatible = "zephyr,mipi-dbi-spi";
+		spi-dev = <&spi3>;
+		dc-gpios = <&gpio0 40 GPIO_ACTIVE_LOW>;
+		reset-gpios = <&gpio0 39 GPIO_ACTIVE_LOW>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		st7735r_160x80: st7735r@0 {
+			compatible = "sitronix,st7735r";
+			mipi-max-frequency = <20000000>;
+			mipi-mode = <MIPI_DBI_MODE_SPI_4WIRE>;
+			reg = <0>;
+			width = <160>;
+			height = <80>;
+			x-offset = <0>;
+			y-offset = <0>;
+			madctl = <0x60>;
+			colmod = <0x55>;
+			vmctr1 = <0x0e>;
+			pwctr1 = [a2 02 84];
+			pwctr2 = [c5];
+			pwctr3 = [0a 00];
+			pwctr4 = [8a 2a];
+			pwctr5 = [8a ee];
+			frmctr1 = [01 2c 2d];
+			frmctr2 = [01 2c 2d];
+			frmctr3 = [01 2c 2d 01 2c 2d];
+			gamctrp1 = [02 1c 07 12 37 32 29 2d 29 25 2b 39 00 01 03 10];
+			gamctrn1 = [03 1d 07 06 2e 2c 29 2d 2e 2e 37 3f 00 00 02 10];
+		};
+	};
+
+};
+
+&usb_serial {
+	status = "okay";
+};
+
+&trng0 {
+	status = "okay";
+};
+
+&spi3 {
+	status = "okay";
+	#address-cells = <1>;
+	#size-cells = <0>;
+	cs-gpios = <&gpio0 38 GPIO_ACTIVE_LOW>;
+	pinctrl-0 = <&spim3_default>;
+	pinctrl-names = "default";
+};
+
+&gpio0 {
+	status = "okay";
+};
+
+&gpio1 {
+	status = "okay";
+};
+
+&wdt0 {
+	status = "okay";
+};
+
+&timer0 {
+	status = "okay";
+};
+
+&timer1 {
+	status = "okay";
+};
+
+&flash0 {
+	status = "okay";
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		boot_partition: partition@0 {
+			label = "mcuboot";
+			reg = <0x00000000 0x0000F000>;
+			read-only;
+		};
+
+		slot0_partition: partition@10000 {
+			label = "image-0";
+			reg = <0x00010000 0x00100000>;
+		};
+
+		slot1_partition: partition@110000 {
+			label = "image-1";
+			reg = <0x00110000 0x00100000>;
+		};
+
+		scratch_partition: partition@210000 {
+			label = "image-scratch";
+			reg = <0x00210000 0x00040000>;
+		};
+
+		storage_partition: partition@250000 {
+			label = "storage";
+			reg = <0x00250000 0x00006000>;
+		};
+	};
+};
